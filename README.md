@@ -1,6 +1,6 @@
 # Certak Kafka SeedKit
 
-A Maven-based Java 25 application that sets up and populates a Kafka ecosystem with realistic data for demo and testing purposes.
+A Maven-based Java 25 application that sets up and populates a Kafka ecosystem with realistic data, for demo and testing purposes.
 
 Primarily used a testing bed for [KafkIO](https://kafkio.com) (Certak's Apache Kafka™ GUI, for Engineers and Administrators)
 
@@ -23,11 +23,102 @@ Certak Kafka SeedKit creates a realistic Kafka environment with:
 ## Prerequisites
 
 - Java 25 (JDK)
+- Docker and Docker Compose (for running the included Kafka environment)
 - Running Kafka ecosystem with:
   - Kafka broker
   - Schema Registry
   - Kafka Connect (2 clusters)
   - KSQL DB
+
+## Kafka Docker Environment
+
+The project includes a complete Kafka environment with SSL support via Docker Compose. This is the easiest way to get started.
+
+### Starting the Kafka Environment
+
+```bash
+# Linux/macOS
+./compose-up.sh
+
+# Windows
+compose-up.cmd
+```
+
+This starts all Kafka services while preserving any existing data from previous runs.
+
+### Starting Fresh (Reset All Data)
+
+To remove all existing data (topics, messages, schemas, connectors) and start with a clean environment:
+
+```bash
+# Linux/macOS
+./compose-reset.sh           # Interactive - prompts for confirmation
+./compose-reset.sh --force   # Non-interactive - skips confirmation
+
+# Windows
+compose-reset.cmd            # Interactive - prompts for confirmation
+compose-reset.cmd --force    # Non-interactive - skips confirmation
+```
+
+### Stopping the Environment
+
+```bash
+# Linux/macOS
+./compose-down.sh
+
+# Windows
+compose-down.cmd
+```
+
+This stops all containers but preserves volumes/data for the next startup.
+
+### Viewing Logs
+```bash
+# Linux/macOS
+./compose-logs.sh              # All services
+./compose-logs.sh kafka0       # Specific service
+./compose-logs.sh --tail 100   # Last 100 lines
+
+# Windows
+compose-logs.cmd               # All services
+compose-logs.cmd kafka0        # Specific service
+compose-logs.cmd --tail 100    # Last 100 lines
+```
+
+### Services and Ports
+
+| Service | HTTP Port | HTTPS Port | Description |
+|---------|-----------|------------|-------------|
+| Kafka | 9092 | 19092 | Kafka broker (plaintext and SSL) |
+| Schema Registry | 8281 | 8285 | Confluent Schema Registry |
+| Kafka Connect 0 | 8082 | 8083 | Primary Connect cluster |
+| Kafka Connect 0-2 | 8182 | 8183 | Second node in primary cluster |
+| Kafka Connect 1 | 8084 | 8085 | Secondary Connect cluster |
+| ksqlDB | 8089 | 8088 | ksqlDB server |
+
+### Hosts File Configuration
+
+Add the following entries to your hosts file (`/etc/hosts` on Linux/macOS, `C:\Windows\System32\drivers\etc\hosts` on Windows):
+
+```
+127.0.0.1            kafka
+127.0.0.1            ksqldb0
+127.0.0.1            connect0
+127.0.0.1            connect1
+127.0.0.1            schemareg0
+127.0.0.1            schemareg1
+```
+
+### Waiting for Services
+
+After starting, wait for all services to be healthy before running the seedkit:
+
+```bash
+# Check service health
+docker compose -f compose/kafka-ssl-compose.yml ps
+```
+
+All services should show `healthy` status (this may take 1-2 minutes on first start).
 
 ## Configuration
 
