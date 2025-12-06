@@ -1,0 +1,107 @@
+# Certak Kafka SeedKit Configuration
+# Configuration for Kafka ecosystem seeding
+
+kafka:
+  bootstrap-servers: kafka:9092
+  client-id: seedkit-producer
+  # Producer settings
+  producer:
+    acks: all
+    retries: 3
+    batch-size: 16384
+    linger-ms: 5
+    buffer-memory: 33554432
+  # Consumer settings (for demo consumers)
+  consumer:
+    auto-offset-reset: earliest
+    enable-auto-commit: true
+    auto-commit-interval-ms: 5000
+
+schema-registry:
+  primary-url: http://schemareg0:8281
+  secondary-url: http://schemareg1:8281
+  # Use primary for writes, secondary as backup
+  auto-register-schemas: true
+
+kafka-connect:
+  clusters:
+    - name: connect-cluster-primary
+      url: http://connect0:8182
+    - name: connect-cluster-secondary
+      url: http://connect1:8182
+
+ksqldb:
+  url: http://ksqldb0:8089
+
+# Topic configuration
+topics:
+  # Replication and partitions for different topic types
+  default-replication-factor: 1
+  default-partitions: 3
+  high-throughput-partitions: 12
+  
+# Seeding behavior
+seeding:
+  # Whether to delete existing topics before creating
+  clean-start: true
+  # Continuous producer settings
+  continuous-producer:
+    enabled: true
+    # Minimum interval between messages (ms)
+    min-interval-ms: 500
+    # Maximum interval between messages (ms)
+    max-interval-ms: 5000
+  # Number of initial messages per topic
+  initial-message-count: 50
+  # Large message topics - messages around 100-300KB
+  large-message-count: 10
+
+# Consumer groups configuration
+consumer-groups:
+  # Number of consumers to spin up
+  enabled: true
+  groups:
+    - name: analytics-pipeline
+      topics:
+        - ecommerce.orders
+        - ecommerce.page-views
+        - ecommerce.user-sessions
+      consumers-count: 3
+    - name: fraud-detection-service
+      topics:
+        - payments.transactions
+        - payments.card-events
+      consumers-count: 2
+    - name: inventory-sync
+      topics:
+        - inventory.stock-updates
+        - inventory.warehouse-events
+      consumers-count: 1
+    - name: notification-service
+      topics:
+        - notifications.email-outbound
+        - notifications.push-events
+        - notifications.sms-queue
+      consumers-count: 2
+    - name: audit-logger
+      topics:
+        - audit.system-events
+        - audit.user-actions
+        - audit.data-access-log
+      consumers-count: 1
+    - name: ml-feature-store
+      topics:
+        - ml.feature-updates
+        - ml.model-predictions
+      consumers-count: 2
+    - name: iot-telemetry-processor
+      topics:
+        - iot.sensor-readings
+        - iot.device-status
+      consumers-count: 4
+    - name: log-aggregator
+      topics:
+        - logs.application
+        - logs.infrastructure
+        - logs.security
+      consumers-count: 2
