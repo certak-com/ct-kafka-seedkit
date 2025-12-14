@@ -1,20 +1,1 @@
-#!/bin/bash
-# Run script for Certak Kafka SeedKit (Linux/macOS)
-
-set -e
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-
-# Build if target doesn't exist or if --build flag is passed
-if [[ "$1" == "--build" ]] || [[ ! -f "target/ct-kafka-seedkit-1.0.0-SNAPSHOT.jar" ]]; then
-    echo "Building Certak Kafka SeedKit..."
-    ./mvnw package -DskipTests -q
-    # Remove --build from args if present
-    if [[ "$1" == "--build" ]]; then
-        shift
-    fi
-fi
-
-echo "Starting Certak Kafka SeedKit..."
-java --enable-preview -jar target/ct-kafka-seedkit-1.0.0-SNAPSHOT.jar "$@"
+#!/bin/bash# Run script for Certak Kafka SeedKit (Linux/macOS)set -eSCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"cd "$SCRIPT_DIR"# Build if target doesn't exist or if --build flag is passedif [[ "$1" == "--build" ]] || [[ ! -f "target/ct-kafka-seedkit-1.0.0-SNAPSHOT.jar" ]]; then    echo "Building Certak Kafka SeedKit..."    ./mvnw package -DskipTests -q    # Remove --build from args if present    if [[ "$1" == "--build" ]]; then        shift    fifiecho "Starting Certak Kafka SeedKit..."java --enable-preview -jar target/ct-kafka-seedkit-1.0.0-SNAPSHOT.jar "$@"
