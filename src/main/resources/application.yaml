@@ -2,7 +2,7 @@
 # Configuration for Kafka ecosystem seeding
 
 kafka:
-  bootstrap-servers: kafka:9092
+  bootstrap-servers: kafka:9092,kafka1:9192
   client-id: seedkit-producer
   # Producer settings
   producer:
@@ -36,7 +36,7 @@ ksqldb:
 # Topic configuration
 topics:
   # Replication and partitions for different topic types
-  default-replication-factor: 1
+  default-replication-factor: 2
   default-partitions: 3
   high-throughput-partitions: 12
   

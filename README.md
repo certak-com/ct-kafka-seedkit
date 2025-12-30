@@ -7,6 +7,8 @@ Primarily used a testing bed for [KafkIO](https://kafkio.com) (Certak's Apache K
 ## Overview
 
 Certak Kafka SeedKit creates a realistic Kafka environment with:
+- **2-broker cluster** with multiple listener types (Plaintext, SSL, SASL_PLAINTEXT, SASL_SSL)
+- **SASL authentication** with configurable users (admin and client)
 - **80+ topics** across multiple domains (e-commerce, payments, IoT, trading, healthcare, etc.)
 - **Multiple schema types**: Avro (primary), Protobuf, and JSON Schema
 - **Schema evolution**: Multiple versions of key schemas to simulate real-world evolution
@@ -25,7 +27,7 @@ Certak Kafka SeedKit creates a realistic Kafka environment with:
 - Java 25 (JDK)
 - Docker and Docker Compose (for running the included Kafka environment)
 - Running Kafka ecosystem with:
-  - Kafka broker
+  - 2 Kafka brokers
   - Schema Registry
   - Kafka Connect (2 clusters)
   - KSQL DB
@@ -87,14 +89,24 @@ compose-logs.cmd --tail 100    # Last 100 lines
 
 ### Services and Ports
 
-| Service | HTTP Port | HTTPS Port | Description |
-|---------|-----------|------------|-------------|
-| Kafka | 9092 | 19092 | Kafka broker (plaintext and SSL) |
-| Schema Registry | 8281 | 8285 | Confluent Schema Registry |
-| Kafka Connect 0 | 8082 | 8083 | Primary Connect cluster |
-| Kafka Connect 0-2 | 8182 | 8183 | Second node in primary cluster |
-| Kafka Connect 1 | 8084 | 8085 | Secondary Connect cluster |
-| ksqlDB | 8089 | 8088 | ksqlDB server |
+| Service | Plaintext | SSL | SASL_PLAINTEXT | SASL_SSL | Description |
+|---------|-----------|-----|----------------|----------|-------------|
+| Kafka 0 | 9092 | 19092 | 9094 | 19094 | Primary Kafka broker |
+| Kafka 1 | 9192 | 19192 | 9194 | 19194 | Secondary Kafka broker |
+| Schema Registry | 8281 | 8285 | - | - | Confluent Schema Registry |
+| Kafka Connect 0 | 8082 | 8083 | - | - | Primary Connect cluster |
+| Kafka Connect 0-2 | 8182 | 8183 | - | - | Second node in primary cluster |
+| Kafka Connect 1 | 8084 | 8085 | - | - | Secondary Connect cluster |
+| ksqlDB | 8089 | 8088 | - | - | ksqlDB server |
+
+### SASL Authentication
+
+Two users are configured for SASL_PLAINTEXT and SASL_SSL listeners:
+
+| Username | Password | Purpose |
+|----------|----------|---------|
+| admin | admin-secret | Administrative operations |
+| client | client-secret | Application connections |
 
 ### Hosts File Configuration
 
@@ -102,6 +114,7 @@ Add the following entries to your hosts file (`/etc/hosts` on Linux/macOS, `C:\W
 
 ```
 127.0.0.1            kafka
+127.0.0.1            kafka1
 127.0.0.1            ksqldb0
 127.0.0.1            connect0
 127.0.0.1            connect1
@@ -126,7 +139,7 @@ Edit `src/main/resources/application.yaml` to configure your Kafka ecosystem:
 
 ```yaml
 kafka:
-  bootstrap-servers: kafka:9092
+  bootstrap-servers: kafka:9092,kafka1:9192
 
 schema-registry:
   primary-url: http://schemareg0:8281
