@@ -2,7 +2,7 @@
 
 A Maven-based Java 25 application that sets up and populates a Kafka ecosystem with realistic data, for demo and testing purposes.
 
-Primarily used a testing bed for [KafkIO](https://kafkio.com) (Certak's Apache Kafka™ GUI, for Engineers and Administrators)
+Primarily used as a testing bed for [KafkIO](https://kafkio.com) (Certak's Apache Kafka™ GUI, for Engineers and Administrators), but useful for anyone needing a rich Kafka environment with diverse data.
 
 ## Overview
 
