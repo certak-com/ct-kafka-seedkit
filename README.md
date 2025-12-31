@@ -89,15 +89,15 @@ compose-logs.cmd --tail 100    # Last 100 lines
 
 ### Services and Ports
 
-| Service           | Plaintext | SSL   | SASL_PLAINTEXT | SASL_SSL | Description |
-|-------------------|-----------|-------|----------------|----------|-------------|
-| Kafka 0           | 9092      | 19092 | 9094 | 19094 | Primary Kafka broker |
-| Kafka 1           | 9192      | 19192 | 9194 | 19194 | Secondary Kafka broker |
-| Schema Registry   | 8281      | 8285  | - | - | Confluent Schema Registry |
-| Kafka Connect 0   | 8082      | 8083  | - | - | Primary Connect cluster |
-| Kafka Connect 0-1 | 8182      | 8183  | - | - | Second node in primary cluster |
-| Kafka Connect 1   | 8084      | 8085  | - | - | Secondary Connect cluster |
-| ksqlDB            | 8088 | 8089 | - | - | ksqlDB server |
+| Service           | Hostname     | Plaintext | SSL   | SASL_PLAINTEXT | SASL_SSL | Description |
+|-------------------|--------------|-----------|-------|----------------|----------|-------------|
+| Kafka 0           | kafka0       | 9092      | 19092 | 9094 | 19094 | Primary Kafka broker |
+| Kafka 1           | kafka1       | 9192      | 19192 | 9194 | 19194 | Secondary Kafka broker |
+| Schema Registry   | schemareg0   | 8281      | 8285  | - | - | Confluent Schema Registry |
+| Kafka Connect 0   | connect0     | 8082      | 8083  | - | - | Primary Connect cluster |
+| Kafka Connect 0-1 | connect0-1   | 8182      | 8183  | - | - | Second node in primary cluster |
+| Kafka Connect 1   | connect1     | 8084      | 8085  | - | - | Secondary Connect cluster |
+| ksqlDB            | ksqldb0      | 8088 | 8089 | - | - | ksqlDB server |
 
 ### SASL Authentication
 
