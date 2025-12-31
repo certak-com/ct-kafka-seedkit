@@ -26,9 +26,9 @@ schema-registry:
 kafka-connect:
   clusters:
     - name: connect-cluster-primary
-      url: http://connect0:8182
+      url: http://connect0:8082
     - name: connect-cluster-secondary
-      url: http://connect1:8182
+      url: http://connect1:8084
 
 ksqldb:
   url: http://ksqldb0:8088

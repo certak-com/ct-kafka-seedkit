@@ -36,6 +36,75 @@ Certak Kafka SeedKit creates a realistic Kafka environment with:
 
 The project includes a complete Kafka environment with SSL support via Docker Compose. This is the easiest way to get started.
 
+### Architecture Diagram
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          Kafka Ecosystem                                   │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  ┌──────────────┐  ┌──────────────┐          ┌──────────────┐              │
+│  │   kafka0     │  │   kafka1     │          │  ksqldb0     │              │
+│  │              │  │              │          │              │              │
+│  │ 9092  (plain)│  │ 9192  (plain)│          │ 8088  (http) │              │
+│  │ 19092 (ssl)  │  │ 19192 (ssl)  │          │ 8089  (https)│              │
+│  │ 9094  (sasl) │  │ 9194  (sasl) │          └──────┬───────┘              │
+│  │ 19094 (s-ssl)│  │ 19194 (s-ssl)│                 │                      │
+│  └──────┬───────┘  └──────┬───────┘                 │                      │
+│         │                 │                         │                      │
+│         └──────────┬──────┘                         │                      │
+│                    │                                │                      │
+│         ┌──────────▼──────────┐                     │                      │
+│         │    schemareg0       │◄────────────────────┘                      │
+│         │                     │                                            │
+│         │ 8281  (http)        │                                            │
+│         │ 8285  (https)       │                                            │
+│         └──────────┬──────────┘                                            │
+│                    │                                                       │
+│         ┌──────────▼──────────────────────────────┐                        │
+│         │       Kafka Connect Clusters (2)        │                        │
+│         │                                         │                        │
+│         │  ┌────────────┐  ┌────────────┐         │                        │
+│         │  │  connect0  │  │ connect0-1 │         │                        │
+│         │  │            │  │            │         │                        │
+│         │  │ 8082 (http)│  │ 8182 (http)│         │                        │
+│         │  │ 8083 (https│  │ 8183 (https│         │                        │
+│         │  └────────────┘  └────────────┘         │                        │
+│         │                                         │                        │
+│         │  ┌────────────┐                         │                        │
+│         │  │  connect1  │                         │                        │
+│         │  │            │                         │                        │
+│         │  │ 8084 (http)│                         │                        │
+│         │  │ 8085 (https│                         │                        │
+│         │  └────────────┘                         │                        │
+│         └─────────────────────────────────────────┘                        │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+                                    ▲
+                                    │
+                                    │
+                    ┌───────────────┴───────────────┐
+                    │                               │
+            ┌───────▼────────┐           ┌─────────▼──────────┐
+            │   Producers    │           │    Consumers       │
+            │                │           │                    │
+            │ • Continuous   │           │ • Permanent (18)   │
+            │   (12 topics)  │           │ • Temporary (5)    │
+            │ • High-freq    │           │ • Intermittent (5) │
+            │   (10 msg/sec) │           │                    │
+            │ • Compression  │           │ • 28 total groups  │
+            │   (lz4/snappy/ │           │                    │
+            │    gzip/none)  │           │                    │
+            └────────────────┘           └────────────────────┘
+
+Legend:
+  plain = PLAINTEXT
+  ssl = SSL
+  sasl = SASL_PLAINTEXT
+  s-ssl = SASL_SSL
+```
+
 ### Starting the Kafka Environment
 
 ```bash
