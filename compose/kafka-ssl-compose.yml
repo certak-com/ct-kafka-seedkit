@@ -5,7 +5,7 @@
 #   client / client-secret (for application connections)
 
 x-common-connect-environment: &common-connect-environment
-  CONNECT_BOOTSTRAP_SERVERS: kafka0:29092,kafka1:29192
+  CONNECT_BOOTSTRAP_SERVERS: "kafka0:29092,kafka1:29192"
   CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
@@ -44,15 +44,15 @@ services:
     ports:
       - "9092:9092"
       - "9997:9997"
-      - "9093:9093"
       - "19092:19092"
       - "9094:9094"
       - "19094:19094"
     environment:
       <<: *kafka-sasl-config
       KAFKA_BROKER_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,SSL:SSL,EXTERNAL_SSL:SSL,PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT_HOST_THIRD_MACHINE:PLAINTEXT,INTERNAL_PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL'
-      KAFKA_ADVERTISED_LISTENERS: 'SSL://kafka0:29092,EXTERNAL_SSL://localhost:19092,PLAINTEXT_HOST://localhost:9092,PLAINTEXT_HOST_THIRD_MACHINE://kafka:9093,INTERNAL_PLAINTEXT://kafka0:39092,SASL_PLAINTEXT://localhost:9094,SASL_SSL://localhost:19094'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,SSL:SSL,EXTERNAL_SSL:SSL,PLAINTEXT_HOST:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL'
+      KAFKA_ADVERTISED_LISTENERS: 'SSL://kafka0:29092,EXTERNAL_SSL://kafka0:19092,PLAINTEXT_HOST://kafka0:9092,SASL_PLAINTEXT://kafka0:9094,SASL_SSL://kafka0:19094'
+      KAFKA_LISTENERS: 'SSL://kafka0:29092,CONTROLLER://kafka0:29093,EXTERNAL_SSL://kafka0:19092,PLAINTEXT_HOST://0.0.0.0:9092,SASL_PLAINTEXT://0.0.0.0:9094,SASL_SSL://0.0.0.0:19094'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -66,7 +66,6 @@ services:
       KAFKA_EARLY_START_LISTENERS: CONTROLLER
       KAFKA_NODE_ID: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193'
-      KAFKA_LISTENERS: 'SSL://kafka0:29092,CONTROLLER://kafka0:29093,EXTERNAL_SSL://kafka0:19092,PLAINTEXT_HOST://0.0.0.0:9092,PLAINTEXT_HOST_THIRD_MACHINE://0.0.0.0:9093,INTERNAL_PLAINTEXT://kafka0:39092,SASL_PLAINTEXT://0.0.0.0:9094,SASL_SSL://0.0.0.0:19094'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'SSL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
@@ -78,8 +77,8 @@ services:
       KAFKA_SSL_KEY_CREDENTIALS: creds
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.truststore.jks
       KAFKA_SSL_TRUSTSTORE_CREDENTIALS: creds
-      #KAFKA_SSL_CLIENT_AUTH: 'required'
-      KAFKA_SSL_CLIENT_AUTH: 'requested'
+      KAFKA_SSL_CLIENT_AUTH: 'required'
+      #KAFKA_SSL_CLIENT_AUTH: 'requested'
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: '' # COMMON NAME VERIFICATION IS DISABLED SERVER-SIDE
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
 
@@ -101,15 +100,15 @@ services:
     ports:
       - "9192:9192"
       - "9998:9998"
-      - "9193:9193"
       - "19192:19192"
       - "9194:9194"
       - "19194:19194"
     environment:
       <<: *kafka-sasl-config
       KAFKA_BROKER_ID: 2
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,SSL:SSL,EXTERNAL_SSL:SSL,PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT_HOST_THIRD_MACHINE:PLAINTEXT,INTERNAL_PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL'
-      KAFKA_ADVERTISED_LISTENERS: 'SSL://kafka1:29192,EXTERNAL_SSL://localhost:19192,PLAINTEXT_HOST://localhost:9192,PLAINTEXT_HOST_THIRD_MACHINE://kafka1:9193,INTERNAL_PLAINTEXT://kafka1:39192,SASL_PLAINTEXT://localhost:9194,SASL_SSL://localhost:19194'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,SSL:SSL,EXTERNAL_SSL:SSL,PLAINTEXT_HOST:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL'
+      KAFKA_ADVERTISED_LISTENERS: 'SSL://kafka1:29192,EXTERNAL_SSL://kafka1:19192,PLAINTEXT_HOST://kafka1:9192,SASL_PLAINTEXT://kafka1:9194,SASL_SSL://kafka1:19194'
+      KAFKA_LISTENERS: 'SSL://kafka1:29192,CONTROLLER://kafka1:29193,EXTERNAL_SSL://kafka1:19192,PLAINTEXT_HOST://0.0.0.0:9192,SASL_PLAINTEXT://0.0.0.0:9194,SASL_SSL://0.0.0.0:19194'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -123,7 +122,6 @@ services:
       KAFKA_EARLY_START_LISTENERS: CONTROLLER
       KAFKA_NODE_ID: 2
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193'
-      KAFKA_LISTENERS: 'SSL://kafka1:29192,CONTROLLER://kafka1:29193,EXTERNAL_SSL://kafka1:19192,PLAINTEXT_HOST://0.0.0.0:9192,PLAINTEXT_HOST_THIRD_MACHINE://0.0.0.0:9193,INTERNAL_PLAINTEXT://kafka1:39192,SASL_PLAINTEXT://0.0.0.0:9194,SASL_SSL://0.0.0.0:19194'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'SSL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.rmi.port=9998
@@ -135,7 +133,7 @@ services:
       KAFKA_SSL_KEY_CREDENTIALS: creds
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.truststore.jks
       KAFKA_SSL_TRUSTSTORE_CREDENTIALS: creds
-      KAFKA_SSL_CLIENT_AUTH: 'requested'
+      KAFKA_SSL_CLIENT_AUTH: 'required'
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ''
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
 
@@ -158,7 +156,7 @@ services:
       timeout: 10s
       retries: 10
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: SSL://kafka0:29092,SSL://kafka1:29192
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SSL://kafka0:29092,SSL://kafka1:29192"
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SSL
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /kafka.truststore.jks
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: secret
@@ -166,7 +164,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD: secret
       SCHEMA_REGISTRY_KAFKASTORE_SSL_KEY_PASSWORD: secret
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry0
-      SCHEMA_REGISTRY_LISTENERS: https://schemaregistry0:8285,http://schemaregistry0:8281
+      SCHEMA_REGISTRY_LISTENERS: "https://schemaregistry0:8285,http://schemaregistry0:8281"
       SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: https
       SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "https"
       SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
@@ -221,7 +219,7 @@ services:
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
 
   # Add a second "connect" node to connect 0
-  kafka-connect0-two:
+  kafka-connect0-1:
     build:
       context: ./kafka-connect
       args:
@@ -237,15 +235,15 @@ services:
       schemaregistry0:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "nc", "-zv", "kafka-connect0-two", "8183" ]
+      test: [ "CMD", "nc", "-zv", "kafka-connect0-1", "8183" ]
       interval: 30s
       timeout: 10s
       retries: 10
     environment:
       <<: *common-connect-environment
       CONNECT_GROUP_ID: compose-connect0-group
-      CONNECT_LISTENERS: "https://kafka-connect0-two:8183,http://kafka-connect0-two:8182"
-      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect0-two
+      CONNECT_LISTENERS: "https://kafka-connect0-1:8183,http://kafka-connect0-1:8182"
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect0-1
       CONNECT_OFFSET_STORAGE_TOPIC: _connect0_offset
       CONNECT_STATUS_STORAGE_TOPIC: _connect0_status
       CONNECT_CONFIG_STORAGE_TOPIC: _connect0_configs
@@ -288,41 +286,6 @@ services:
     volumes:
       - ./ssl/kafka.truststore.jks:/kafka.truststore.jks
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
-#
-#  kafka-init-topics:
-#    image: confluentinc/cp-kafka:7.9.4
-#    volumes:
-#      - ./data/messages.json.txt:/data/messages.json.txt
-#    depends_on:
-#      kafka0:
-#        condition: service_healthy
-#    command: "bash -c 'echo Waiting for Kafka to be ready... && \
-#               cub kafka-ready -b kafka0:39092 1 30 && \
-#               kafka-topics --create --topic users --partitions 3 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:39092 && \
-#               kafka-topics --create --topic messages --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:39092 && \
-#               kafka-topics --create --topic customers --partitions 3 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:39092 && \
-#               kafka-topics --create --topic stores --partitions 3 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:39092 && \
-#               kafka-topics --create --topic product --partitions 3 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:39092 && \
-#               kafka-console-producer --bootstrap-server kafka0:39092 --topic users < /data/messages.json.txt'"
-#
-#  create-connectors-connect0:
-#    image: curlimages/curl
-#    depends_on:
-#      kafka-connect0:
-#        condition: service_healthy
-#    volumes:
-#      - ./connector_connect0:/connectors
-#    command: sh -c '/connectors/start.sh'
-#
-#  create-connectors-connect1:
-#    image: curlimages/curl
-#    depends_on:
-#      kafka-connect1:
-#        condition: service_healthy
-#    volumes:
-#      - ./connector_connect1:/connectors
-#    command: sh -c '/connectors/start.sh'
-
   ksqldb0:
     image: confluentinc/cp-ksqldb-server:7.9.4
     depends_on:
@@ -335,7 +298,7 @@ services:
       kafka-connect0:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "nc", "-zv", "ksqldb0", "8088" ]
+      test: [ "CMD", "nc", "-zv", "ksqldb0", "8089" ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -344,8 +307,8 @@ services:
       - "8089:8089"
     environment:
       KSQL_CUB_KAFKA_TIMEOUT: 120
-      KSQL_LISTENERS: "https://0.0.0.0:8088,http://0.0.0.0:8089"
-      KSQL_BOOTSTRAP_SERVERS: SSL://kafka0:29092,SSL://kafka1:29192
+      KSQL_LISTENERS: "http://0.0.0.0:8088,https://0.0.0.0:8089"
+      KSQL_BOOTSTRAP_SERVERS: "SSL://kafka0:29092,SSL://kafka1:29192"
       KSQL_SECURITY_PROTOCOL: SSL
       KSQL_SSL_TRUSTSTORE_LOCATION: /kafka.truststore.jks
       KSQL_SSL_TRUSTSTORE_PASSWORD: secret

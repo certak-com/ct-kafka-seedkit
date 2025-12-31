@@ -89,15 +89,15 @@ compose-logs.cmd --tail 100    # Last 100 lines
 
 ### Services and Ports
 
-| Service | Plaintext | SSL | SASL_PLAINTEXT | SASL_SSL | Description |
-|---------|-----------|-----|----------------|----------|-------------|
-| Kafka 0 | 9092 | 19092 | 9094 | 19094 | Primary Kafka broker |
-| Kafka 1 | 9192 | 19192 | 9194 | 19194 | Secondary Kafka broker |
-| Schema Registry | 8281 | 8285 | - | - | Confluent Schema Registry |
-| Kafka Connect 0 | 8082 | 8083 | - | - | Primary Connect cluster |
-| Kafka Connect 0-2 | 8182 | 8183 | - | - | Second node in primary cluster |
-| Kafka Connect 1 | 8084 | 8085 | - | - | Secondary Connect cluster |
-| ksqlDB | 8089 | 8088 | - | - | ksqlDB server |
+| Service           | Plaintext | SSL   | SASL_PLAINTEXT | SASL_SSL | Description |
+|-------------------|-----------|-------|----------------|----------|-------------|
+| Kafka 0           | 9092      | 19092 | 9094 | 19094 | Primary Kafka broker |
+| Kafka 1           | 9192      | 19192 | 9194 | 19194 | Secondary Kafka broker |
+| Schema Registry   | 8281      | 8285  | - | - | Confluent Schema Registry |
+| Kafka Connect 0   | 8082      | 8083  | - | - | Primary Connect cluster |
+| Kafka Connect 0-1 | 8182      | 8183  | - | - | Second node in primary cluster |
+| Kafka Connect 1   | 8084      | 8085  | - | - | Secondary Connect cluster |
+| ksqlDB            | 8088 | 8089 | - | - | ksqlDB server |
 
 ### SASL Authentication
 
@@ -113,10 +113,11 @@ Two users are configured for SASL_PLAINTEXT and SASL_SSL listeners:
 Add the following entries to your hosts file (`/etc/hosts` on Linux/macOS, `C:\Windows\System32\drivers\etc\hosts` on Windows):
 
 ```
-127.0.0.1            kafka
+127.0.0.1            kafka0
 127.0.0.1            kafka1
 127.0.0.1            ksqldb0
 127.0.0.1            connect0
+127.0.0.1            connect0-1
 127.0.0.1            connect1
 127.0.0.1            schemareg0
 127.0.0.1            schemareg1
