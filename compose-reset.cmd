@@ -24,7 +24,7 @@ if /i not "%CONFIRM%"=="y" (
 
 :confirmed
 echo Stopping and removing all containers and volumes...
-docker compose -f kafka-ssl-compose.yml down -v --remove-orphans
+docker compose -f kafka-confluent-environment-ssl.yml down -v --remove-orphans
 if errorlevel 1 (
     echo Failed to stop Docker environment!
     exit /b 1
@@ -32,7 +32,7 @@ if errorlevel 1 (
 
 echo.
 echo Starting fresh Kafka environment...
-docker compose -f kafka-ssl-compose.yml up -d
+docker compose -f kafka-confluent-environment-ssl.yml up -d
 if errorlevel 1 (
     echo Failed to start Docker environment!
     exit /b 1
@@ -53,5 +53,5 @@ echo   ksqlDB:          localhost:8088 (HTTP), localhost:8089 (HTTPS)
 echo.
 echo SASL Users: admin/admin-secret, client/client-secret
 echo.
-echo To view logs: docker compose -f compose/kafka-ssl-compose.yml logs -f
+echo To view logs: docker compose -f compose/kafka-confluent-environment-ssl.yml logs -f
 echo To stop:      compose-down.cmd

@@ -4,6 +4,8 @@
 #   admin / admin-secret  (for administrative operations)
 #   client / client-secret (for application connections)
 
+name: kafka-confluent-environment-ssl
+
 x-common-connect-environment: &common-connect-environment
   CONNECT_BOOTSTRAP_SERVERS: "kafka0:29092,kafka1:29192"
   CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2

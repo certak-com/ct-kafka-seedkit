@@ -6,7 +6,7 @@ setlocal
 cd /d "%~dp0compose"
 
 echo Stopping Kafka Docker environment...
-docker compose -f kafka-ssl-compose.yml down
+docker compose -f kafka-confluent-environment-ssl.yml down
 if errorlevel 1 (
     echo Failed to stop Docker environment!
     exit /b 1

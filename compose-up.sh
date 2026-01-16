@@ -11,7 +11,7 @@ echo "Starting Kafka Docker environment..."
 echo "(Use compose-reset.sh to start fresh with no persisted data)"
 echo ""
 
-docker compose -f kafka-ssl-compose.yml up -d
+docker compose -f kafka-confluent-environment-ssl.yml up -d
 
 echo ""
 echo "Kafka environment started!"
@@ -28,5 +28,5 @@ echo "  ksqlDB:          localhost:8088 (HTTP), localhost:8089 (HTTPS)"
 echo ""
 echo "SASL Users: admin/admin-secret, client/client-secret"
 echo ""
-echo "To view logs: docker compose -f compose/kafka-ssl-compose.yml logs -f"
+echo "To view logs: docker compose -f compose/kafka-confluent-environment-ssl.yml logs -f"
 echo "To stop:      ./compose-down.sh"

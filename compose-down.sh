@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/compose"
 
 echo "Stopping Kafka Docker environment..."
-docker compose -f kafka-ssl-compose.yml down
+docker compose -f kafka-confluent-environment-ssl.yml down
 
 echo ""
 echo "Kafka environment stopped."

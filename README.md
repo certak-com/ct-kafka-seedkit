@@ -198,7 +198,7 @@ After starting, wait for all services to be healthy before running the seedkit:
 
 ```bash
 # Check service health
-docker compose -f compose/kafka-ssl-compose.yml ps
+docker compose -f compose/kafka-confluent-environment-ssl.yml ps
 ```
 
 All services should show `healthy` status (this may take 1-2 minutes on first start).
