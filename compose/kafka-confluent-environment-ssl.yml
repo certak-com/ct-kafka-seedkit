@@ -34,10 +34,9 @@ x-kafka-sasl-config: &kafka-sasl-config
     -Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf
 
 services:
-  kafka0:
-    image: confluentinc/cp-kafka:7.9.4
+  seedkit-kafka0:
     hostname: kafka0
-    container_name: kafka0
+    image: confluentinc/cp-kafka:7.9.4
     healthcheck:
       test: unset JMX_PORT && KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9999" && kafka-broker-api-versions --bootstrap-server=localhost:9092
       interval: 30s
@@ -90,10 +89,9 @@ services:
       - ./ssl/kafka.keystore.jks:/etc/kafka/secrets/kafka.keystore.jks
       - ./ssl/kafka_jaas.conf:/etc/kafka/secrets/kafka_jaas.conf
 
-  kafka1:
-    image: confluentinc/cp-kafka:7.9.4
+  seedkit-kafka1:
     hostname: kafka1
-    container_name: kafka1
+    image: confluentinc/cp-kafka:7.9.4
     healthcheck:
       test: unset JMX_PORT && KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.rmi.port=9998" && kafka-broker-api-versions --bootstrap-server=localhost:9192
       interval: 30s
@@ -145,12 +143,13 @@ services:
       - ./ssl/kafka.keystore.jks:/etc/kafka/secrets/kafka.keystore.jks
       - ./ssl/kafka_jaas.conf:/etc/kafka/secrets/kafka_jaas.conf
 
-  schemaregistry0:
+  seedkit-schemaregistry0:
+    hostname: schemaregistry0
     image: confluentinc/cp-schema-registry:7.9.4
     depends_on:
-      kafka0:
+      seedkit-kafka0:
         condition: service_healthy
-      kafka1:
+      seedkit-kafka1:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "timeout", "1", "curl", "--silent", "--fail", "http://schemaregistry0:8281/subjects" ]
@@ -186,7 +185,8 @@ services:
       - ./ssl/kafka.truststore.jks:/kafka.truststore.jks
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
 
-  kafka-connect0:
+  seedkit-kafka-connect0:
+    hostname: kafka-connect0
     build:
       context: ./kafka-connect
       args:
@@ -195,11 +195,11 @@ services:
       - "8083:8083"
       - "8082:8082"
     depends_on:
-      kafka0:
+      seedkit-kafka0:
         condition: service_healthy
-      kafka1:
+      seedkit-kafka1:
         condition: service_healthy
-      schemaregistry0:
+      seedkit-schemaregistry0:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "nc", "-zv", "kafka-connect0", "8083" ]
@@ -221,7 +221,8 @@ services:
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
 
   # Add a second "connect" node to connect 0
-  kafka-connect0-1:
+  seedkit-kafka-connect0-1:
+    hostname: kafka-connect0-1
     build:
       context: ./kafka-connect
       args:
@@ -230,11 +231,11 @@ services:
       - "8183:8183"
       - "8182:8182"
     depends_on:
-      kafka0:
+      seedkit-kafka0:
         condition: service_healthy
-      kafka1:
+      seedkit-kafka1:
         condition: service_healthy
-      schemaregistry0:
+      seedkit-schemaregistry0:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "nc", "-zv", "kafka-connect0-1", "8183" ]
@@ -255,7 +256,8 @@ services:
       - ./ssl/kafka.truststore.jks:/kafka.truststore.jks
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
 
-  kafka-connect1:
+  seedkit-kafka-connect1:
+    hostname: kafka-connect1
     build:
       context: ./kafka-connect
       args:
@@ -264,11 +266,11 @@ services:
       - "8085:8085"
       - "8084:8084"
     depends_on:
-      kafka0:
+      seedkit-kafka0:
         condition: service_healthy
-      kafka1:
+      seedkit-kafka1:
         condition: service_healthy
-      schemaregistry0:
+      seedkit-schemaregistry0:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "nc", "-zv", "kafka-connect1", "8085" ]
@@ -288,16 +290,17 @@ services:
     volumes:
       - ./ssl/kafka.truststore.jks:/kafka.truststore.jks
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
-  ksqldb0:
+  seedkit-ksqldb0:
+    hostname: ksqldb0
     image: confluentinc/cp-ksqldb-server:7.9.4
     depends_on:
-      kafka0:
+      seedkit-kafka0:
         condition: service_healthy
-      kafka1:
+      seedkit-kafka1:
         condition: service_healthy
-      schemaregistry0:
+      seedkit-schemaregistry0:
         condition: service_healthy
-      kafka-connect0:
+      seedkit-kafka-connect0:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "nc", "-zv", "ksqldb0", "8089" ]
