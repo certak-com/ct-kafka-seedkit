@@ -7,7 +7,7 @@ Primarily used as a testing bed for [KafkIO](https://kafkio.com) (Certak's Apach
 ## Overview
 
 Certak Kafka SeedKit creates a realistic Kafka environment with:
-- **2-broker cluster** with multiple listener types (Plaintext, SSL, SASL_PLAINTEXT, SASL_SSL)
+- **3-broker cluster** with multiple listener types (Plaintext, SSL, SASL_PLAINTEXT, SASL_SSL)
 - **SASL authentication** with configurable users (admin and client)
 - **80+ topics** across multiple domains (e-commerce, payments, IoT, trading, healthcare, etc.)
 - **Multiple schema types**: Avro (primary), Protobuf, and JSON Schema
@@ -27,7 +27,7 @@ Certak Kafka SeedKit creates a realistic Kafka environment with:
 - Java 25 (JDK)
 - Docker and Docker Compose (for running the included Kafka environment)
 - Running Kafka ecosystem with:
-  - 2 Kafka brokers
+  - 3 Kafka brokers
   - Schema Registry
   - Kafka Connect (2 clusters)
   - KSQL DB
@@ -43,41 +43,41 @@ The project includes a complete Kafka environment with SSL support via Docker Co
 │                          Kafka Ecosystem                                   │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│  ┌──────────────┐  ┌──────────────┐          ┌──────────────┐              │
-│  │   kafka0     │  │   kafka1     │          │  ksqldb0     │              │
-│  │              │  │              │          │              │              │
-│  │ 9092  (plain)│  │ 9192  (plain)│          │ 8088  (http) │              │
-│  │ 19092 (ssl)  │  │ 19192 (ssl)  │          │ 8089  (https)│              │
-│  │ 9094  (sasl) │  │ 9194  (sasl) │          └──────┬───────┘              │
-│  │ 19094 (s-ssl)│  │ 19194 (s-ssl)│                 │                      │
-│  └──────┬───────┘  └──────┬───────┘                 │                      │
-│         │                 │                         │                      │
-│         └──────────┬──────┘                         │                      │
-│                    │                                │                      │
-│         ┌──────────▼──────────┐                     │                      │
-│         │    schemareg0       │◄────────────────────┘                      │
-│         │                     │                                            │
-│         │ 8281  (http)        │                                            │
-│         │ 8285  (https)       │                                            │
-│         └──────────┬──────────┘                                            │
-│                    │                                                       │
-│         ┌──────────▼──────────────────────────────┐                        │
-│         │       Kafka Connect Clusters (2)        │                        │
-│         │                                         │                        │
-│         │  ┌────────────┐  ┌────────────┐         │                        │
-│         │  │  connect0  │  │ connect0-1 │         │                        │
-│         │  │            │  │            │         │                        │
-│         │  │ 8082 (http)│  │ 8182 (http)│         │                        │
-│         │  │ 8083 (https│  │ 8183 (https│         │                        │
-│         │  └────────────┘  └────────────┘         │                        │
-│         │                                         │                        │
-│         │  ┌────────────┐                         │                        │
-│         │  │  connect1  │                         │                        │
-│         │  │            │                         │                        │
-│         │  │ 8084 (http)│                         │                        │
-│         │  │ 8085 (https│                         │                        │
-│         │  └────────────┘                         │                        │
-│         └─────────────────────────────────────────┘                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │   kafka0     │  │   kafka1     │  │   kafka2     │  │  ksqldb0     │    │
+│  │              │  │              │  │              │  │              │    │
+│  │ 9092  (plain)│  │ 9192  (plain)│  │ 9292  (plain)│  │ 8088  (http) │    │
+│  │ 19092 (ssl)  │  │ 19192 (ssl)  │  │ 19292 (ssl)  │  │ 8089  (https)│    │
+│  │ 9094  (sasl) │  │ 9194  (sasl) │  │ 9294  (sasl) │  └──────┬───────┘    │
+│  │ 19094 (s-ssl)│  │ 19194 (s-ssl)│  │ 19294 (s-ssl)│         │            │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘         │            │
+│         │                 │                 │                 │            │
+│         └─────────────────┴─────────────────┘                 │            │
+│                           │                                   │            │
+│                ┌──────────▼──────────┐                        │            │
+│                │    schemareg0       │◄───────────────────────┘            │
+│                │                     │                                     │
+│                │ 8281  (http)        │                                     │
+│                │ 8285  (https)       │                                     │
+│                └──────────┬──────────┘                                     │
+│                           │                                                │
+│                ┌──────────▼──────────────────────────────┐                 │
+│                │       Kafka Connect Clusters (2)        │                 │
+│                │                                         │                 │
+│                │  ┌────────────┐  ┌────────────┐         │                 │
+│                │  │  connect0  │  │ connect0-1 │         │                 │
+│                │  │            │  │            │         │                 │
+│                │  │ 8082 (http)│  │ 8182 (http)│         │                 │
+│                │  │ 8083 (https│  │ 8183 (https│         │                 │
+│                │  └────────────┘  └────────────┘         │                 │
+│                │                                         │                 │
+│                │  ┌────────────┐                         │                 │
+│                │  │  connect1  │                         │                 │
+│                │  │            │                         │                 │
+│                │  │ 8084 (http)│                         │                 │
+│                │  │ 8085 (https│                         │                 │
+│                │  └────────────┘                         │                 │
+│                └─────────────────────────────────────────┘                 │
 │                                                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 
@@ -162,6 +162,7 @@ compose-logs.cmd --tail 100    # Last 100 lines
 |-------------------|--------------|-----------|-------|----------------|----------|-------------|
 | Kafka 0           | kafka0       | 9092      | 19092 | 9094 | 19094 | Primary Kafka broker |
 | Kafka 1           | kafka1       | 9192      | 19192 | 9194 | 19194 | Secondary Kafka broker |
+| Kafka 2           | kafka2       | 9292      | 19292 | 9294 | 19294 | Tertiary Kafka broker |
 | Schema Registry   | schemareg0   | 8281      | 8285  | - | - | Confluent Schema Registry |
 | Kafka Connect 0   | connect0     | 8082      | 8083  | - | - | Primary Connect cluster |
 | Kafka Connect 0-1 | connect0-1   | 8182      | 8183  | - | - | Second node in primary cluster |
@@ -184,6 +185,7 @@ Add the following entries to your hosts file (`/etc/hosts` on Linux/macOS, `C:\W
 ```
 127.0.0.1            kafka0
 127.0.0.1            kafka1
+127.0.0.1            kafka2
 127.0.0.1            ksqldb0
 127.0.0.1            connect0
 127.0.0.1            connect0-1
@@ -209,7 +211,7 @@ Edit `src/main/resources/application.yaml` to configure your Kafka ecosystem:
 
 ```yaml
 kafka:
-  bootstrap-servers: kafka:9092,kafka1:9192
+  bootstrap-servers: kafka0:9092,kafka1:9192,kafka2:9292
 
 schema-registry:
   primary-url: http://schemareg0:8281

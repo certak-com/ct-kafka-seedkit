@@ -7,7 +7,7 @@
 name: kafka-confluent-environment-ssl
 
 x-common-connect-environment: &common-connect-environment
-  CONNECT_BOOTSTRAP_SERVERS: "kafka0:29092,kafka1:29192"
+  CONNECT_BOOTSTRAP_SERVERS: "kafka0:29092,kafka1:29192,kafka2:29292"
   CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
@@ -66,7 +66,7 @@ services:
       KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin
       KAFKA_EARLY_START_LISTENERS: CONTROLLER
       KAFKA_NODE_ID: 1
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193,3@kafka2:29293'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'SSL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
@@ -121,10 +121,64 @@ services:
       KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin
       KAFKA_EARLY_START_LISTENERS: CONTROLLER
       KAFKA_NODE_ID: 2
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193,3@kafka2:29293'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'SSL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.rmi.port=9998
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      KAFKA_SECURITY_PROTOCOL: SSL
+      KAFKA_SSL_ENABLED_MECHANISMS: PLAIN,SSL
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: creds
+      KAFKA_SSL_KEY_CREDENTIALS: creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: creds
+      KAFKA_SSL_CLIENT_AUTH: 'required'
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ''
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+
+    volumes:
+      - ./ssl/creds:/etc/kafka/secrets/creds
+      - ./ssl/kafka.truststore.jks:/etc/kafka/secrets/kafka.truststore.jks
+      - ./ssl/kafka.keystore.jks:/etc/kafka/secrets/kafka.keystore.jks
+      - ./ssl/kafka_jaas.conf:/etc/kafka/secrets/kafka_jaas.conf
+
+  seedkit-kafka2:
+    hostname: kafka2
+    image: confluentinc/cp-kafka:7.9.4
+    healthcheck:
+      test: unset JMX_PORT && KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka2 -Dcom.sun.management.jmxremote.rmi.port=9999" && kafka-broker-api-versions --bootstrap-server=localhost:9292
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    ports:
+      - "9292:9292"
+      - "9999:9999"
+      - "19292:19292"
+      - "9294:9294"
+      - "19294:19294"
+    environment:
+      <<: *kafka-sasl-config
+      KAFKA_BROKER_ID: 3
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,SSL:SSL,EXTERNAL_SSL:SSL,PLAINTEXT_HOST:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL'
+      KAFKA_ADVERTISED_LISTENERS: 'SSL://kafka2:29292,EXTERNAL_SSL://kafka2:19292,PLAINTEXT_HOST://kafka2:9292,SASL_PLAINTEXT://kafka2:9294,SASL_SSL://kafka2:19294'
+      KAFKA_LISTENERS: 'SSL://kafka2:29292,CONTROLLER://kafka2:29293,EXTERNAL_SSL://kafka2:19292,PLAINTEXT_HOST://0.0.0.0:9292,SASL_PLAINTEXT://0.0.0.0:9294,SASL_SSL://0.0.0.0:19294'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: true
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin
+      KAFKA_EARLY_START_LISTENERS: CONTROLLER
+      KAFKA_NODE_ID: 3
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29193,3@kafka2:29293'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'SSL'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka2 -Dcom.sun.management.jmxremote.rmi.port=9999
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       KAFKA_SECURITY_PROTOCOL: SSL
       KAFKA_SSL_ENABLED_MECHANISMS: PLAIN,SSL
@@ -151,13 +205,15 @@ services:
         condition: service_healthy
       seedkit-kafka1:
         condition: service_healthy
+      seedkit-kafka2:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "timeout", "1", "curl", "--silent", "--fail", "http://schemaregistry0:8281/subjects" ]
       interval: 30s
       timeout: 10s
       retries: 10
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SSL://kafka0:29092,SSL://kafka1:29192"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SSL://kafka0:29092,SSL://kafka1:29192,SSL://kafka2:29292"
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SSL
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /kafka.truststore.jks
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: secret
@@ -199,6 +255,8 @@ services:
         condition: service_healthy
       seedkit-kafka1:
         condition: service_healthy
+      seedkit-kafka2:
+        condition: service_healthy
       seedkit-schemaregistry0:
         condition: service_healthy
     healthcheck:
@@ -235,6 +293,8 @@ services:
         condition: service_healthy
       seedkit-kafka1:
         condition: service_healthy
+      seedkit-kafka2:
+        condition: service_healthy
       seedkit-schemaregistry0:
         condition: service_healthy
     healthcheck:
@@ -270,6 +330,8 @@ services:
         condition: service_healthy
       seedkit-kafka1:
         condition: service_healthy
+      seedkit-kafka2:
+        condition: service_healthy
       seedkit-schemaregistry0:
         condition: service_healthy
     healthcheck:
@@ -298,6 +360,8 @@ services:
         condition: service_healthy
       seedkit-kafka1:
         condition: service_healthy
+      seedkit-kafka2:
+        condition: service_healthy
       seedkit-schemaregistry0:
         condition: service_healthy
       seedkit-kafka-connect0:
@@ -313,7 +377,7 @@ services:
     environment:
       KSQL_CUB_KAFKA_TIMEOUT: 120
       KSQL_LISTENERS: "http://0.0.0.0:8088,https://0.0.0.0:8089"
-      KSQL_BOOTSTRAP_SERVERS: "SSL://kafka0:29092,SSL://kafka1:29192"
+      KSQL_BOOTSTRAP_SERVERS: "SSL://kafka0:29092,SSL://kafka1:29192,SSL://kafka2:29292"
       KSQL_SECURITY_PROTOCOL: SSL
       KSQL_SSL_TRUSTSTORE_LOCATION: /kafka.truststore.jks
       KSQL_SSL_TRUSTSTORE_PASSWORD: secret
