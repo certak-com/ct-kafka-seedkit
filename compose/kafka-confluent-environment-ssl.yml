@@ -4,6 +4,9 @@
 #   admin / admin-secret  (for administrative operations)
 #   client / client-secret (for application connections)
 
+# Confluent Platform version - defined in compose/.env file
+# Override with: CONFLUENT_VERSION=x.x.x docker compose up
+
 name: kafka-confluent-environment-ssl
 
 x-common-connect-environment: &common-connect-environment
@@ -36,7 +39,7 @@ x-kafka-sasl-config: &kafka-sasl-config
 services:
   seedkit-kafka0:
     hostname: kafka0
-    image: confluentinc/cp-kafka:7.9.4
+    image: confluentinc/cp-kafka:${CONFLUENT_VERSION}
     healthcheck:
       test: unset JMX_PORT && KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9999" && kafka-broker-api-versions --bootstrap-server=localhost:9092
       interval: 30s
@@ -91,7 +94,7 @@ services:
 
   seedkit-kafka1:
     hostname: kafka1
-    image: confluentinc/cp-kafka:7.9.4
+    image: confluentinc/cp-kafka:${CONFLUENT_VERSION}
     healthcheck:
       test: unset JMX_PORT && KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.rmi.port=9998" && kafka-broker-api-versions --bootstrap-server=localhost:9192
       interval: 30s
@@ -145,7 +148,7 @@ services:
 
   seedkit-kafka2:
     hostname: kafka2
-    image: confluentinc/cp-kafka:7.9.4
+    image: confluentinc/cp-kafka:${CONFLUENT_VERSION}
     healthcheck:
       test: unset JMX_PORT && KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka2 -Dcom.sun.management.jmxremote.rmi.port=9999" && kafka-broker-api-versions --bootstrap-server=localhost:9292
       interval: 30s
@@ -199,7 +202,7 @@ services:
 
   seedkit-schemaregistry0:
     hostname: schemaregistry0
-    image: confluentinc/cp-schema-registry:7.9.4
+    image: confluentinc/cp-schema-registry:${CONFLUENT_VERSION}
     depends_on:
       seedkit-kafka0:
         condition: service_healthy
@@ -246,7 +249,7 @@ services:
     build:
       context: ./kafka-connect
       args:
-        image: confluentinc/cp-kafka-connect:7.9.4
+        image: confluentinc/cp-kafka-connect:${CONFLUENT_VERSION}
     ports:
       - "8083:8083"
       - "8082:8082"
@@ -284,7 +287,7 @@ services:
     build:
       context: ./kafka-connect
       args:
-        image: confluentinc/cp-kafka-connect:7.9.4
+        image: confluentinc/cp-kafka-connect:${CONFLUENT_VERSION}
     ports:
       - "8183:8183"
       - "8182:8182"
@@ -321,7 +324,7 @@ services:
     build:
       context: ./kafka-connect
       args:
-        image: confluentinc/cp-kafka-connect:7.9.4
+        image: confluentinc/cp-kafka-connect:${CONFLUENT_VERSION}
     ports:
       - "8085:8085"
       - "8084:8084"
@@ -354,7 +357,7 @@ services:
       - ./ssl/kafka.keystore.jks:/kafka.keystore.jks
   seedkit-ksqldb0:
     hostname: ksqldb0
-    image: confluentinc/cp-ksqldb-server:7.9.4
+    image: confluentinc/cp-ksqldb-server:${CONFLUENT_VERSION}
     depends_on:
       seedkit-kafka0:
         condition: service_healthy
